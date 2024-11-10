@@ -1,0 +1,65 @@
+type BasketInvestment = record {
+  basket_type : BasketType;
+  timestamp : nat64;
+  token_balances : vec record { text; nat };
+  eth_invested : nat;
+  current_value : nat;
+};
+type BasketType = variant { BTC; DEFI; MEME; STABLE };
+type CanisterSettingsDto = record {
+  fee : nat64;
+  interval : nat64;
+  token_in_address : text;
+  owner : text;
+  token_out_address : text;
+  amount_in : nat64;
+  token_in_name : text;
+  token_out_name : text;
+  slippage : nat64;
+};
+type DashboardView = record {
+  user : principal;
+  total_eth_invested : nat;
+  basket_investments : vec BasketInvestment;
+  total_value_locked : nat;
+};
+type LogItem = record {
+  ok : opt text;
+  err : opt text;
+  event : LogItemEvent;
+  timestamp : nat64;
+};
+type LogItemEvent = variant {
+  Start;
+  Approve;
+  Stop;
+  Swap;
+  Transfer;
+  SavePoolAddress;
+};
+type Result = variant { Ok; Err : text };
+type Result_1 = variant { Ok : text; Err : text };
+type Result_2 = variant { Ok : CanisterSettingsDto; Err : text };
+type UserPosition = record {
+  eth_deposited : nat;
+  token_amounts : vec record { text; nat };
+  basket_type : BasketType;
+  timestamp : nat64;
+};
+service : (CanisterSettingsDto) -> {
+  deposit : (BasketType) -> (Result);
+  get_balance_in : () -> (Result_1);
+  get_balance_out : () -> (Result_1);
+  get_basket_investments : (principal, BasketType) -> (vec UserPosition) query;
+  get_canister_address : () -> (Result_1);
+  get_dashboard : (principal) -> (opt DashboardView) query;
+  get_log : () -> (vec LogItem) query;
+  get_settings : () -> (Result_2) query;
+  start : () -> (Result_1);
+  stop : () -> (Result_1);
+  swap_link : () -> (Result_1);
+  swap_pepe : () -> (Result_1);
+  swap_wbtc : () -> (Result_1);
+  transfer_in_token : (text, nat64) -> (Result_1);
+  transfer_out_token : (text, nat64) -> (Result_1);
+}
