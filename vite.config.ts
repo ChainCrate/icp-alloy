@@ -1,9 +1,10 @@
 import { defineConfig } from "vite";
 import dotenv from "dotenv";
-import environment from "vite-plugin-environment";
-import viteReact from "@vitejs/plugin-react";
+// import environment from "vite-plugin-environment";
+// import viteReact from "@vitejs/plugin-react";
 import path from "path"
-
+import react from '@vitejs/plugin-react'
+import macrosPlugin from 'vite-plugin-babel-macros'
 dotenv.config({ path: ".env" });
 
 export default defineConfig({
@@ -31,9 +32,27 @@ export default defineConfig({
     },
   },
   plugins: [
-    viteReact(),
-    environment("all", { prefix: "CANISTER_" }),
-    environment("all", { prefix: "DFX_" }),
+    react({
+      babel: {
+        plugins: [
+          'babel-plugin-macros',
+          [
+            '@emotion/babel-plugin-jsx-pragmatic',
+            {
+              export: 'jsx',
+              import: '__cssprop',
+              module: '@emotion/react',
+            },
+          ],
+          [
+            '@babel/plugin-transform-react-jsx',
+            { pragma: '__cssprop' },
+            'twin.macro',
+          ],
+        ],
+      },
+    }),
+    macrosPlugin(),
   ],
 });
 
